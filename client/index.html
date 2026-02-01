@@ -6,6 +6,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- PWA метатеги -->
+    <meta name="theme-color" content="#007bff" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    
     <!-- Основные метатеги -->
     <title>Медицинский Портал Вопрос-Ответ | Здоровье и Медицина</title>
     <meta name="description" content="Профессиональный медицинский портал вопрос-ответ. Получите квалифицированную медицинскую информацию и консультации от специалистов.">
@@ -57,5 +62,19 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Регистрация сервис-воркера
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW зарегистрирован: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('Ошибка регистрации SW: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

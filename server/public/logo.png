@@ -2,14 +2,8 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- PWA метатеги -->
-    <meta name="theme-color" content="#007bff" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/logo.png" />
     
     <!-- Основные метатеги -->
     <title>Медицинский Портал Вопрос-Ответ | Здоровье и Медицина</title>
@@ -58,25 +52,10 @@
     </script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script type="module" crossorigin src="/assets/index.js"></script>
-    <link rel="stylesheet" href="/assets/index.css">
+    <script type="module" crossorigin src="/assets/index-CbbPlvDa.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CMApH1Kr.css">
   </head>
   <body>
     <div id="root"></div>
-    
-    <script>
-      // Регистрация сервис-воркера
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW зарегистрирован: ', registration);
-            })
-            .catch((registrationError) => {
-              console.log('Ошибка регистрации SW: ', registrationError);
-            });
-        });
-      }
-    </script>
   </body>
 </html>

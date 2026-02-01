@@ -17,5 +17,14 @@ export default defineConfig({
   build: {
     outDir: '../server/public',
     emptyOutDir: true,
-  }
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
+      }
+    },
+    copyPublicDir: true
+  },
+  publicDir: 'public'
 })

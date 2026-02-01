@@ -4,6 +4,30 @@
 
 Медицинский портал представляет собой веб-приложение для управления базой знаний медицинских вопросов и ответов. Приложение имеет три уровня доступа: публичный доступ к вопросам, админ-панель для управления контентом и суперадмин-панель для управления пользователями и системой в целом.
 
+## Основные функции
+
+### Публичная часть
+- Просмотр списка медицинских вопросов и ответов
+- Поиск по вопросам
+- Пагинация результатов
+- Сортировка по дате создания
+- Просмотр вопросов по категориям
+- Кэширование запросов для повышения производительности
+
+### Админ-панель
+- Аутентификация администратора
+- Создание, редактирование и удаление вопросов
+- Создание, редактирование и удаление категорий
+- Статистика по вопросам
+- Графики активности
+- Предотвращение дублирования вопросов
+
+### Суперадмин-панель
+- Управление пользователями (админами)
+- Назначение ролей
+- Просмотр истории действий админов
+- Экспорт логов действий в CSV
+
 ## Технический стек
 
 ### Фронтенд
@@ -13,72 +37,47 @@
 - React Router
 - Recharts (для графиков)
 - CSS (кастомная стилизация)
-- favicon.ico и favicon.svg для отображения иконки сайта
 
 ### Бэкенд
 - Node.js
 - Express
 - PostgreSQL
 - Sequelize ORM
+- Node-cache (для кэширования)
 
 ### Аутентификация и безопасность
 - JWT токены
 - Cookie-based sessions
+- Rate limiting
+- CSRF защита
+- Bcrypt для хэширования паролей
 
-## Структура проекта
+## Архитектура проекта
 
 ```
 .
 ├── client/                 # Фронтенд приложение (React)
-│   ├── public/             # Статические файлы (favicon.ico, favicon.svg)
+│   ├── public/             # Статические файлы
 │   ├── src/
-│   │   ├── components/   # Переиспользуемые компоненты
-│   │   ├── pages/         # Страницы приложения
-│   │   ├── services/     # API сервисы
+│   │   ├── components/     # Переиспользуемые компоненты
+│   │   ├── pages/          # Страницы приложения
+│   │   ├── services/       # API сервисы
 │   │   └── ...
 │   └── ...
 ├── server/                # Бэкенд приложение (Node.js/Express)
-│   ├── config/            # Конфигурация базы данных
-│   ├── middleware/        # Промежуточное ПО
-│   ├── migrations/        # Миграции базы данных
-│   ├── models/            # Модели данных (Sequelize)
-│   ├── routes/            # API маршруты
-│   ├── seeders/           # Начальные данные
-│   ├── public/            # Статические файлы
+│   ├── config/             # Конфигурация базы данных
+│   ├── middleware/          # Промежуточное ПО
+│   ├── migrations/          # Миграции базы данных
+│   ├── models/              # Модели данных (Sequelize)
+│   ├── routes/              # API маршруты
+│   ├── seeders/             # Начальные данные
+│   ├── public/              # Статические файлы
 │   └── ...
+├── deployment/              # Файлы для развертывания
 └── README.md
 ```
 
-## Основные функции
-
-### Публичная часть
-- Просмотр списка медицинских вопросов и ответов
-- Поиск по вопросам
-- Пагинация результатов
-- Сортировка по дате создания
-
-### Админ-панель
-- Аутентификация администратора
-- Создание, редактирование и удаление вопросов
-- Создание, редактирование и удаление категорий
-- Статистика по вопросам
-- Графики активности
-
-### Суперадмин-панель
-- Управление пользователями (админами)
-- Назначение ролей
-- Просмотр истории действий админов
-- Экспорт логов действий в CSV
-
 ## Быстрый старт
-
-### Favicon
-
-Приложение использует два файла favicon для отображения иконки сайта:
-- `client/public/favicon.ico` - основной favicon в формате ICO
-- `client/public/favicon.svg` - альтернативный favicon в формате SVG
-
-Оба файла автоматически обслуживаются Vite и подключаются в `client/index.html`.
 
 ### Требования
 - Node.js (v14 или выше)
@@ -96,14 +95,14 @@
 2. Установите зависимости для бэкенда:
    ```bash
    cd server
-   yarn install
+   npm install
    cd ..
    ```
 
 3. Установите зависимости для фронтенда:
    ```bash
    cd client
-   yarn install
+   npm install
    cd ..
    ```
 
@@ -114,7 +113,7 @@
 3. Создайте таблицы в базе данных:
    ```bash
    cd server
-   yarn setup-db
+   npm run setup-db
    cd ..
    ```
 
@@ -144,26 +143,87 @@ npm run dev
 Для запуска только бэкенда:
 ```bash
 cd server
-yarn dev
+npm run dev
 ```
 
 Для запуска только фронтенда:
 ```bash
 cd client
-yarn dev
+npm run dev
 ```
 
-## Безопасность
+## Примеры использования
 
-- Пароли хэшируются с использованием bcrypt
-- JWT токены с истечением срока действия (24 часа)
-- Rate limiting для попыток входа (5 попыток за 15 минут)
-- Проверка ролей на уровне middleware
+### API запросы
+
+#### Получение списка вопросов (публичный endpoint)
+```bash
+# Получить все вопросы
+curl -X GET http://localhost:5000/api/questions
+
+# Поиск вопросов с пагинацией
+curl -X GET "http://localhost:5000/api/questions?search=диабет&page=1&limit=10"
+
+# Получить вопросы определенной категории
+curl -X GET "http://localhost:5000/api/questions?categoryId=1"
+```
+
+#### Аутентификация администратора
+```bash
+# Вход в систему
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "password123"}'
+```
+
+#### Создание вопроса (требует аутентификации админа)
+```bash
+curl -X POST http://localhost:5000/api/questions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "question": "Что такое гипертония?",
+    "answer": "Гипертония - это хроническое заболевание...",
+    "categoryId": 1
+  }'
+```
+
+#### Создание категории (требует аутентификации админа)
+```bash
+curl -X POST http://localhost:5000/api/categories \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "name": "Кардиология",
+    "description": "Вопросы о заболеваниях сердца и сосудов"
+  }'
+```
+
+#### Создание администратора (требует аутентификации суперадмина)
+```bash
+curl -X POST http://localhost:5000/api/users/admin \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "username": "newadmin",
+    "email": "newadmin@example.com",
+    "password": "securepassword123"
+  }'
+```
+
+## Развертывание
+
+Подробное руководство по развертыванию приложения на VPS сервере REG.RU находится в файле [DEPLOYMENT.md](DEPLOYMENT.md).
+
+Для быстрого развертывания на VPS можно использовать скрипт [deploy.sh](deploy.sh):
+
+```bash
+./deploy.sh
+```
 
 ## API Endpoints
 
 ### Аутентификация
-- `POST /api/auth/register` - Регистрация пользователя
 - `POST /api/auth/login` - Вход в систему
 - `GET /api/auth/me` - Получение информации о текущем пользователе
 - `POST /api/auth/logout` - Выход из системы
@@ -193,42 +253,14 @@ yarn dev
 2. **Админ (admin)** - Доступ к админ-панели для управления вопросами и категориями
 3. **Суперадмин (superadmin)** - Полный доступ ко всем функциям системы
 
-## Разработка
+## Безопасность
 
-### Структура базы данных
-
-#### Таблица Users
-- id (INTEGER, PRIMARY KEY)
-- username (STRING)
-- email (STRING, UNIQUE)
-- password (STRING)
-- role (ENUM: 'user', 'admin', 'superadmin')
-- createdAt (DATE)
-- updatedAt (DATE)
-
-#### Таблица Questions
-- id (INTEGER, PRIMARY KEY)
-- question (TEXT)
-- answer (TEXT)
-- categoryId (INTEGER, FOREIGN KEY)
-- createdAt (DATE)
-- updatedAt (DATE)
-
-#### Таблица Categories
-- id (INTEGER, PRIMARY KEY)
-- name (STRING)
-- description (TEXT)
-- createdAt (DATE)
-- updatedAt (DATE)
-
-#### Таблица ActionLogs
-- id (INTEGER, PRIMARY KEY)
-- userId (INTEGER, FOREIGN KEY)
-- actionType (STRING)
-- description (TEXT)
-- entityId (INTEGER)
-- entityType (STRING)
-- createdAt (DATE)
+- Пароли хэшируются с использованием bcrypt
+- JWT токены с истечением срока действия (24 часа)
+- Rate limiting для попыток входа (5 попыток за 15 минут)
+- Проверка ролей на уровне middleware
+- CSRF защита для всех форм
+- Предотвращение дублирования вопросов
 
 ## Лицензия
 
