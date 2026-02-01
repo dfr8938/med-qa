@@ -172,7 +172,7 @@ function AdminPanel() {
       try {
         // Получаем количество вопросов в категории
         const response = await api.get(`/categories/${category.id}/questions`)
-        const questionCount = response.data.length || 0
+        const questionCount = response.data ? response.data.length : 0
         
         // Открываем модальное окно подтверждения
         setDeleteCategoryModal({
@@ -183,7 +183,13 @@ function AdminPanel() {
         })
       } catch (error) {
         console.error('Ошибка при получении информации о категории:', error)
-        showNotification('Ошибка при получении информации о категории: ' + error.message, 'error')
+        // Даже при ошибке продолжаем показ модального окна с 0 вопросов
+        setDeleteCategoryModal({
+          isOpen: true,
+          categoryId: category.id,
+          categoryName: category.name,
+          questionCount: 0
+        })
       }
     }
     
