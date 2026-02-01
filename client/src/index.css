@@ -234,7 +234,8 @@ a:focus {
 }
 
 /* Кнопки ошибки */
-.btn-error, .btn-danger {
+.btn-error,
+.btn-danger {
   background-color: var(--color-error);
   color: white;
 }
@@ -390,8 +391,6 @@ select.input,
   flex-direction: column;
   gap: var(--spacing-4);
 }
-
-/* Дублирующееся объявление .form-group удалено */
 
 .form-group label {
   font-weight: 500;
@@ -672,7 +671,6 @@ a {
   padding: var(--spacing-4);
   flex: 1;
 }
-
 
 .form-group label {
   font-weight: 500;
@@ -1067,8 +1065,6 @@ a {
   justify-content: flex-end;
 }
 
-
-
 .category-management {
   margin-bottom: var(--spacing-8);
 }
@@ -1251,7 +1247,6 @@ a {
   background-color: var(--color-primary-hover);
 }
 
-
 .btn-danger:hover {
   background-color: #dc2626;
 }
@@ -1352,7 +1347,6 @@ a {
   margin-bottom: var(--spacing-3);
 }
 
-
 .role-select:focus {
   border-color: var(--color-primary);
   outline: 0;
@@ -1420,8 +1414,6 @@ textarea.input {
   font-weight: 500;
 }
 
-/* Удалены дублирующиеся стили .modal-header и .modal-close */
-
 .add-category-form,
 .add-question-form,
 .edit-category-form,
@@ -1450,8 +1442,17 @@ textarea.input {
   color: var(--color-text);
 }
 
+.confirm-modal .modal-body p:first-child {
+  margin-top: 0;
+}
+
+.confirm-modal .modal-body p:last-child {
+  margin-bottom: 0;
+}
+
 .confirm-modal .form-actions {
   margin-top: var(--spacing-6);
+  padding: 0 var(--spacing-4) var(--spacing-4);
 }
 
 .confirm-modal .btn {

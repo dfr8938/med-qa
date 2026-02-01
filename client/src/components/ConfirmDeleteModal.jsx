@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 function ConfirmDeleteModal({ isOpen, onClose, onConfirm, username }) {
   if (!isOpen) return null;
 
@@ -11,9 +10,9 @@ function ConfirmDeleteModal({ isOpen, onClose, onConfirm, username }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+      <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Подтверждение удаления администратора</h3>
+          <h3>Подтверждение удаления</h3>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         
@@ -26,7 +25,7 @@ function ConfirmDeleteModal({ isOpen, onClose, onConfirm, username }) {
         
         <div className="form-actions">
           <button type="button" className="btn btn-danger" onClick={handleConfirm}>
-            Удалить администратора
+            Удалить
           </button>
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Отмена

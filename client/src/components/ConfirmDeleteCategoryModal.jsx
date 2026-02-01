@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 function ConfirmDeleteCategoryModal({ isOpen, onClose, onConfirm, categoryName, questionCount }) {
   if (!isOpen) return null;
 
@@ -11,9 +10,9 @@ function ConfirmDeleteCategoryModal({ isOpen, onClose, onConfirm, categoryName, 
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+      <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Подтверждение удаления категории</h3>
+          <h3>Подтверждение удаления</h3>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         
@@ -27,7 +26,7 @@ function ConfirmDeleteCategoryModal({ isOpen, onClose, onConfirm, categoryName, 
         
         <div className="form-actions">
           <button type="button" className="btn btn-danger" onClick={handleConfirm}>
-            Удалить категорию и все вопросы
+            Удалить
           </button>
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Отмена

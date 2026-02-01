@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 function ConfirmDeleteQuestionModal({ isOpen, onClose, onConfirm, questionText }) {
   if (!isOpen) return null;
 
@@ -11,15 +10,15 @@ function ConfirmDeleteQuestionModal({ isOpen, onClose, onConfirm, questionText }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+      <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Подтверждение удаления вопроса</h3>
+          <h3>Подтверждение удаления</h3>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         
         <div className="modal-body">
           <p>Вы уверены, что хотите удалить вопрос:</p>
-          <p className="question-text"><strong>{questionText}</strong>?</p>
+          <p><strong>{questionText}</strong>?</p>
           <p className="warning-text">
             Это действие невозможно отменить.
           </p>
@@ -27,7 +26,7 @@ function ConfirmDeleteQuestionModal({ isOpen, onClose, onConfirm, questionText }
         
         <div className="form-actions">
           <button type="button" className="btn btn-danger" onClick={handleConfirm}>
-            Удалить вопрос
+            Удалить
           </button>
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Отмена
