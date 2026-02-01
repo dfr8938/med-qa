@@ -9,10 +9,10 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Проверка прав администратора
-if [[ $EUID -eq 0 ]]; then
-   echo -e "${RED}[-] Этот скрипт не должен запускаться от имени root${NC}" 1>&2
-   exit 1
-fi
+# if [[ $EUID -eq 0 ]]; then
+#    echo -e "${RED}[-] Этот скрипт не должен запускаться от имени root${NC}" 1>&2
+#    exit 1
+# fi
 
 # Проверка наличия необходимых утилит
 command -v git >/dev/null 2>&1 || { echo -e "${RED}[-] Требуется git, но он не установлен.${NC}" >&2; exit 1; }
@@ -48,7 +48,7 @@ npm install --production
 # Установка зависимостей для клиента
 echo -e "${GREEN}[+] Установка зависимостей клиента${NC}"
 cd ../client
-npm install --production
+npm install
 
 # Создание production сборки
 echo -e "${GREEN}[+] Создание production сборки${NC}"

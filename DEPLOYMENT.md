@@ -62,26 +62,39 @@ npm install --production
 
 # Клиент
 cd ../client
-npm install --production
+npm install
 ```
 
 ### 3. Настройка переменных окружения
 Создайте файл `server/.env.production`:
 ```env
-JWT_SECRET=your_strong_secret_key_here
+JWT_SECRET=your_strong_secret_key_here_for_production
 NODE_ENV=production
 PORT=5000
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=med_qa_db
 DB_USER=med_qa_user
-DB_PASSWORD=your_strong_db_password
+DB_PASSWORD=your_strong_db_password_here
 ```
 
 ### 4. Создание production сборки
 ```bash
 cd /opt/med-qa-portal/client
 npm run build
+```
+
+## Миграции и сиды
+
+### 1. Запуск миграций
+```bash
+cd /opt/med-qa-portal/server
+npx sequelize-cli db:migrate
+```
+
+### 2. Загрузка сидов
+```bash
+npx sequelize-cli db:seed:all
 ```
 
 ## Настройка systemd сервиса
