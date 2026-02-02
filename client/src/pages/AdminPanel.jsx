@@ -197,10 +197,7 @@ function AdminPanel() {
       const { categoryId } = deleteCategoryModal
       
       try {
-        // Сначала удаляем все вопросы из категории
-        await api.delete(`/categories/${categoryId}/questions`)
-        
-        // Затем удаляем саму категорию
+        // Удаляем категорию (все вопросы в категории будут удалены автоматически на сервере)
         await api.delete(`/categories/${categoryId}`)
         
         // Обновляем список категорий

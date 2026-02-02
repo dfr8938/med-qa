@@ -32,15 +32,26 @@ sudo apt install nginx -y
 
 ## Настройка базы данных
 
-### 1. Создание базы данных и пользователя
+### 1. Создание баз данных для разных сред
+```bash
+sudo -u postgres createdb med_qa_dev_db
+sudo -u postgres createdb med_qa_test_db
+sudo -u postgres createdb med_qa_prod_db
+```
+
+### 2. Создание пользователя базы данных и выдача привилегий
 ```bash
 sudo -u postgres psql
 ```
 
 ```sql
-CREATE DATABASE med_qa_db;
-CREATE USER med_qa_user WITH ENCRYPTED PASSWORD 'your_strong_password';
-GRANT ALL PRIVILEGES ON DATABASE med_qa_db TO med_qa_user;
+-- Для сред разработки и тестирования используется пользователь postgres
+-- Для продакшена создаем отдельного пользователя
+CREATE USER med_qa_user WITH ENCRYPTED PASSWORD 'K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f';
+GRANT ALL PRIVILEGES ON DATABASE med_qa_prod_db TO med_qa_user;
+-- Для разработки и тестирования также выдаем привилегии пользователю postgres
+GRANT ALL PRIVILEGES ON DATABASE med_qa_dev_db TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE med_qa_test_db TO postgres;
 \q
 ```
 
@@ -73,9 +84,34 @@ NODE_ENV=production
 PORT=5000
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=med_qa_db
+DB_NAME=med_qa_prod_db
 DB_USER=med_qa_user
-DB_PASSWORD=your_strong_db_password_here
+DB_PASSWORD=K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f
+```
+
+Также создайте файлы `.env.development` и `.env.test` для соответствующих сред:
+```env
+# .env.development
+JWT_SECRET=your_jwt_secret_here
+NODE_ENV=development
+PORT=5000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=med_qa_dev_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+```
+
+```env
+# .env.test
+JWT_SECRET=your_jwt_secret_here
+NODE_ENV=test
+PORT=5000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=med_qa_test_db
+DB_USER=postgres
+DB_PASSWORD=postgres
 ```
 
 ### 4. Создание production сборки
@@ -85,6 +121,19 @@ npm run build
 ```
 
 ## Миграции и сиды
+
+Перед запуском миграций убедитесь, что переменные окружения установлены правильно. Для production среды используйте:
+
+```bash
+export NODE_ENV=production
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_NAME=med_qa_prod_db
+export DB_USER=med_qa_user
+export DB_PASSWORD=K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f
+```
+
+Или убедитесь, что файл `server/.env.production` существует и содержит правильные значения переменных окружения.
 
 ### 1. Запуск миграций
 ```bash
@@ -96,6 +145,8 @@ npx sequelize-cli db:migrate
 ```bash
 npx sequelize-cli db:seed:all
 ```
+
+Если вы используете production среду, убедитесь, что переменная окружения NODE_ENV установлена в значение "production" перед запуском миграций и сидов.
 
 ## Настройка systemd сервиса
 
@@ -133,6 +184,21 @@ cd /opt/med-qa-portal/server
 npm run setup-db
 ```
 
+## Проверка подключения к базам данных
+
+Для проверки корректности настроек подключения к базам данных используйте следующие команды:
+
+```bash
+# Проверка подключения к базе разработки
+psql -U postgres -d med_qa_dev_db -c "SELECT current_database(), current_user;"
+
+# Проверка подключения к тестовой базе
+psql -U postgres -d med_qa_test_db -c "SELECT current_database(), current_user;"
+
+# Проверка подключения к продакшен базе
+psql -U med_qa_user -d med_qa_prod_db -c "SELECT current_database(), current_user;"
+```
+
 ## Обновление приложения
 
 Для обновления приложения используйте скрипт `deploy.sh`:
@@ -154,6 +220,35 @@ sudo ufw allow OpenSSH
 sudo ufw allow 'Nginx Full'
 sudo ufw enable
 ```
+ | ```
+ | 
+ | ## Изменение пароля пользователя postgres
+ | 
+ | Для изменения пароля пользователя postgres выполните следующие шаги:
+ | 
+ | 1. Подключитесь к PostgreSQL от имени пользователя postgres:
+ |    ```bash
+ |    sudo -u postgres psql
+ |    ```
+ | 
+ | 2. Внутри PostgreSQL измените пароль:
+ |    ```sql
+ |    ALTER USER postgres PASSWORD 'новый_пароль';
+ |    ```
+ | 
+ | 3. Выйдите из PostgreSQL:
+ |    ```sql
+ |    \q
+ |    ```
+ | 
+ | 4. Обновите пароль в файлах конфигурации:
+ |    - `server/.env.development`
+ |    - `server/.env.test`
+ | 
+ | 5. Перезапустите сервис:
+ |    ```bash
+ |    sudo systemctl restart med-qa.service
+ |    ```
 
 ## Мониторинг и логирование
 

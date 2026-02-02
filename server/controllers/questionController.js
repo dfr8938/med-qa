@@ -1,34 +1,22 @@
 const { Question, Category } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
-const NodeCache = require('node-cache');
-
-/**
- * Экземпляр кэша для хранения результатов запросов
- * Используется для уменьшения нагрузки на базу данных
- * @type {NodeCache}
- */
-const cache = new NodeCache({ stdTTL: 300 });
 
 /**
  * Контроллер для получения всех вопросов
  * Поддерживает пагинацию, поиск, сортировку и фильтрацию по категориям
- * Использует кэширование для повышения производительности
  * @param {Object} req - Объект запроса Express
  * @param {Object} res - Объект ответа Express
+ */
+/**
+ * Получение всех вопросов с пагинацией, поиском и фильтрацией
+ * @param {import('express').Request} req - Объект запроса Express
+ * @param {import('express').Response} res - Объект ответа Express
+ * @returns {Promise<void>}
  */
 const getAllQuestions = async (req, res) => {
   try {
     const { search, page = 1, limit = 10, sortBy = 'createdAt', order = 'DESC', categoryId } = req.query;
-    
-    // Создаем ключ кэша на основе параметров запроса
-    const cacheKey = `questions_${search || 'all'}_${page}_${limit}_${sortBy}_${order}_${categoryId || 'all'}`;
-    
-    // Проверяем наличие данных в кэше
-    const cachedData = cache.get(cacheKey);
-    if (cachedData) {
-      return res.json(cachedData);
-    }
     
     let whereClause = {};
     const offset = (page - 1) * limit;
@@ -100,10 +88,6 @@ const getAllQuestions = async (req, res) => {
       filteredQuestionsCount: rows.length
     };
     
-    // Сохраняем результат в кэш
-    // Преобразуем данные в JSON и обратно, чтобы избежать проблем с клонированием
-    cache.set(cacheKey, JSON.parse(JSON.stringify(result)));
-    
     res.json(result);
   } catch (error) {
     console.error('Ошибка при получении вопросов:', error);
@@ -116,6 +100,12 @@ const getAllQuestions = async (req, res) => {
  * Доступен только для администраторов
  * @param {Object} req - Объект запроса Express
  * @param {Object} res - Объект ответа Express
+ */
+/**
+ * Создание нового вопроса
+ * @param {import('express').Request} req - Объект запроса Express
+ * @param {import('express').Response} res - Объект ответа Express
+ * @returns {Promise<void>}
  */
 const createQuestion = async (req, res) => {
   try {
@@ -138,9 +128,6 @@ const createQuestion = async (req, res) => {
     }
     
     const newQuestion = await Question.create({ question, answer, categoryId });
-    
-    // Очищаем кэш при создании нового вопроса
-    cache.flushAll();
     
     // Возвращаем созданный вопрос с информацией о категории
     const questionWithCategory = await Question.findByPk(newQuestion.id, {
@@ -208,9 +195,6 @@ const updateQuestion = async (req, res) => {
       }]
     });
     
-    // Очищаем кэш при обновлении вопроса
-    cache.flushAll();
-    
     res.json(questionData);
   } catch (error) {
     console.error('Ошибка при обновлении вопроса:', error);
@@ -236,9 +220,6 @@ const deleteQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Вопрос не найден' });
     }
     
-    // Очищаем кэш при удалении вопроса
-    cache.flushAll();
-    
     res.json({ message: 'Вопрос успешно удален' });
   } catch (error) {
     console.error('Ошибка при удалении вопроса:', error);
@@ -250,6 +231,5 @@ module.exports = {
   getAllQuestions,
   createQuestion,
   updateQuestion,
-  deleteQuestion,
-  cache
+  deleteQuestion
 };

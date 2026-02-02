@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-
 function AddAdminModal({ isOpen, onClose, onAddAdmin }) {
   const [adminData, setAdminData] = useState({
     username: '',
@@ -8,6 +7,7 @@ function AddAdminModal({ isOpen, onClose, onAddAdmin }) {
     password: ''
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -49,7 +49,7 @@ function AddAdminModal({ isOpen, onClose, onAddAdmin }) {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     
@@ -58,7 +58,12 @@ function AddAdminModal({ isOpen, onClose, onAddAdmin }) {
       return;
     }
     
-    onAddAdmin(adminData);
+    setLoading(true);
+    try {
+      await onAddAdmin(adminData);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -133,9 +138,8 @@ function AddAdminModal({ isOpen, onClose, onAddAdmin }) {
           </div>
           
           <div className="form-actions">
-            <button type="submit" className="btn btn-success">Сохранить</button>
-            <button type="button" className="btn btn-secondary" onClick={() => setAdminData({...adminData, username: '', email: '', password: ''})}>
-              Очистить
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
             <button type="button" className="btn btn-secondary" onClick={handleClose}>
               Отмена

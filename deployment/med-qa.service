@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
+User=root
 WorkingDirectory=/opt/med-qa-portal/server
-ExecStart=/usr/bin/node index.js
+ExecStart=/root/.nvm/versions/node/v24.13.0/bin/node index.js
 Restart=always
 RestartSec=10
 Environment=NODE_ENV=production

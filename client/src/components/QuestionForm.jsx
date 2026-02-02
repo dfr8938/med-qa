@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react'
  * @param {Function} onSubmit - Функция для отправки данных формы
  * @param {Object} initialData - Начальные данные для редактирования вопроса
  * @param {Function} onCancel - Функция для отмены редактирования
- * @param {Array} availableCategories - Список доступных категорий
+ * @param {Array<{id: number, name: string, description: string}>} availableCategories - Список доступных категорий
  */
 function QuestionForm({ onSubmit, initialData, onCancel, availableCategories = [] }) {
   // Состояние для хранения данных формы

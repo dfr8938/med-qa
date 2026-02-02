@@ -7,6 +7,14 @@ const bcrypt = require('bcryptjs');
 /**
  * Модель пользователя системы
  * Представляет администраторов и суперадминистраторов портала
+ * @typedef {Object} User
+ * @property {number} id - Идентификатор пользователя
+ * @property {string} username - Имя пользователя
+ * @property {string} email - Email пользователя
+ * @property {string} password - Хэшированный пароль
+ * @property {'admin'|'superadmin'} role - Роль пользователя
+ * @property {Date} createdAt - Дата создания
+ * @property {Date} updatedAt - Дата обновления
  */
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {

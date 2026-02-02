@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Notification from '../components/Notification'
 import api from '../services/api'
@@ -14,6 +14,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [notification, setNotification] = useState(null)
   const navigate = useNavigate()
+
 
   const handleChange = (e) => {
     setCredentials({

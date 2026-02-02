@@ -1,20 +1,29 @@
 const { Client } = require('pg')
 const dotenv = require('dotenv')
 const bcrypt = require('bcryptjs')
+const config = require('../config/config.json')
 
 // Загрузка переменных окружения
 dotenv.config()
 
+// Определяем окружение
+const env = process.env.NODE_ENV || 'development'
+
 // Конфигурация для подключения к PostgreSQL (без указания базы данных)
+// Для создания пользователя и базы данных используем учетные данные суперпользователя
 const clientConfig = {
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
+  user: config.development.username,
+  password: config.development.password,
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 5432,
 }
 
 // Имя базы данных из переменных окружения
 const dbName = process.env.DB_NAME || 'med_qa_db'
+
+// Учетные данные для создания пользователя med_qa_user
+const dbUser = process.env.DB_USER || 'med_qa_user'
+const dbPassword = process.env.DB_PASSWORD || 'K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f'
 
 async function dropAndCreateDatabase() {
   let client
@@ -43,19 +52,58 @@ async function dropAndCreateDatabase() {
   }
 }
 
+// Функция для создания пользователя med_qa_user в PostgreSQL
+async function createDBUser() {
+  let client
+
+  try {
+    // Подключение к PostgreSQL с правами суперпользователя
+    client = new Client({
+      ...clientConfig
+    })
+    
+    await client.connect()
+    console.log('Подключение к PostgreSQL с правами суперпользователя успешно установлено.')
+
+    // Создание пользователя med_qa_user
+    await client.query(`CREATE USER "${dbUser}" WITH PASSWORD '${dbPassword}'`)
+    console.log(`Пользователь "${dbUser}" успешно создан.`)
+    
+    // Назначение прав пользователю
+    await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${dbName}" TO "${dbUser}"`)
+    await client.query(`GRANT ALL ON SCHEMA public TO "${dbUser}"`)
+    console.log(`Права для пользователя "${dbUser}" успешно назначены.`)
+  } catch (error) {
+    if (error.message.includes('already exists')) {
+      console.log(`Пользователь "${dbUser}" уже существует.`)
+    } else {
+      console.error('Ошибка при создании пользователя:', error.message)
+    }
+  } finally {
+    // Закрытие подключения
+    if (client) {
+      await client.end()
+      console.log('Подключение к PostgreSQL закрыто.')
+    }
+  }
+}
+
 // Функция для создания суперпользователя
 async function createSuperAdmin() {
   let client
 
   try {
-    // Подключение к базе данных
+    // Подключение к базе данных от имени med_qa_user
     client = new Client({
-      ...clientConfig,
+      user: dbUser,
+      password: dbPassword,
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
       database: dbName
     })
     
     await client.connect()
-    console.log(`Подключение к базе данных "${dbName}" успешно установлено.`)
+    console.log(`Подключение к базе данных "${dbName}" от имени "${dbUser}" успешно установлено.`)
 
     // Создание таблицы пользователей
     await client.query(`
@@ -96,6 +144,7 @@ async function createSuperAdmin() {
 // Запуск скрипта
 async function run() {
   await dropAndCreateDatabase()
+  await createDBUser()
   await createSuperAdmin()
 }
 

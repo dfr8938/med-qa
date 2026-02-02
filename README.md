@@ -12,7 +12,6 @@
 - Пагинация результатов
 - Сортировка по дате создания
 - Просмотр вопросов по категориям
-- Кэширование запросов для повышения производительности
 
 ### Админ-панель
 - Аутентификация администратора
@@ -43,7 +42,6 @@
 - Express
 - PostgreSQL
 - Sequelize ORM
-- Node-cache (для кэширования)
 
 ### Аутентификация и безопасность
 - JWT токены
@@ -108,27 +106,78 @@
 
 ### Настройка базы данных
 
-1. Создайте базу данных PostgreSQL
-2. Обновите файл `server/config/config.json` с вашими учетными данными
-3. Создайте таблицы в базе данных:
-   ```bash
-   cd server
-   npm run setup-db
-   cd ..
-   ```
+В проекте используются раздельные базы данных для разных сред:
+- `med_qa_dev_db` для среды разработки
+- `med_qa_test_db` для тестовой среды
+- `med_qa_prod_db` для продакшен среды
+
+Конфигурация подключения к базам данных находится в файле `server/config/config.json`:
+
+```json
+{
+  "development": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "med_qa_dev_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "med_qa_test_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "med_qa_user",
+    "password": "K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f",
+    "database": "med_qa_prod_db",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}
+```
+
+### Проверка подключения к базам данных
+
+Для проверки подключения к базам данных используйте следующие команды:
+
+```bash
+# Проверка подключения к базе разработки
+psql -U postgres -d med_qa_dev_db -c "SELECT current_database(), current_user;"
+
+# Проверка подключения к тестовой базе
+psql -U postgres -d med_qa_test_db -c "SELECT current_database(), current_user;"
+
+# Проверка подключения к продакшен базе
+psql -U med_qa_user -d med_qa_prod_db -c "SELECT current_database(), current_user;"
+```
 
 ### Переменные окружения
 
-Создайте файл `.env` в папке `server` со следующими переменными:
+Создайте файл `.env` в папке `server` со следующими переменными или используйте `.env.example` как шаблон:
+
+**ВАЖНО**: Никогда не храните файл `.env` в системе контроля версий. Он должен быть добавлен в `.gitignore`.
 
 ```
+JWT_SECRET=your_jwt_secret_here
+NODE_ENV=development
 PORT=5000
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-DB_NAME=your_db_name
 DB_HOST=localhost
-JWT_SECRET=your_jwt_secret_key
+DB_PORT=5432
+DB_NAME=med_qa_db
+DB_USER=med_qa_user
+DB_PASSWORD=your_db_password_here
 ```
+
+**Рекомендации по безопасности**:
+- Используйте сложные пароли для базы данных
+- Храните JWT_SECRET в безопасном месте и регулярно меняйте его
+- Не используйте учетные данные из примеров в production
+
+### Запуск приложения
 
 ### Запуск приложения
 

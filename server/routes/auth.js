@@ -6,6 +6,7 @@ const { User } = require('../models')
 const { authenticateToken } = require('../middleware/auth')
 const rateLimit = require('express-rate-limit')
 const { Op } = require('sequelize')
+// const { csrfProtection, csrfToken } = require('../middleware/csrf')
 require('dotenv').config()
 
 
@@ -71,6 +72,14 @@ router.post('/register', async (req, res) => {
 //   standardHeaders: true,
 //   legacyHeaders: false,
 // })
+
+/**
+ * Маршрут для получения CSRF токена
+ * Доступен без аутентификации
+ */
+router.get('/csrf-token', (req, res) => {
+  res.json({ csrfToken: '' });
+});
 
 /**
  * Маршрут для входа пользователя в систему

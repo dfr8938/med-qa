@@ -5,6 +5,8 @@ import React, { useState } from 'react'
  * @param {Function} onSubmit - Функция для отправки данных формы
  * @param {Function} onCancel - Функция для отмены редактирования
  * @param {Object} initialData - Начальные данные для редактирования категории
+ * @param {string} initialData.name - Название категории
+ * @param {string} initialData.description - Описание категории
  */
 function CategoryForm({ onSubmit, onCancel, initialData }) {
   // Состояние для хранения данных формы
