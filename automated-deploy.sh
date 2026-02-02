@@ -147,7 +147,7 @@ install_packages() {
     
     # Установка Node.js
     if ! command -v node &> /dev/null; then
-        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
         apt-get install -y nodejs
         log_success "Node.js установлен"
     else
@@ -202,6 +202,26 @@ setup_database() {
     sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE med_qa_prod_db TO med_qa_user;"
     sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE med_qa_dev_db TO postgres;"
     sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE med_qa_test_db TO postgres;"
+    
+    # Назначение привилегий на схему public
+    sudo -u postgres psql -d med_qa_prod_db -c "GRANT ALL ON SCHEMA public TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO med_qa_user;"
+    sudo -u postgres psql -d med_qa_prod_db -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO med_qa_user;"
+    
+    # Для разработки и тестирования
+    sudo -u postgres psql -d med_qa_dev_db -c "GRANT ALL ON SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_dev_db -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_dev_db -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_dev_db -c "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO postgres;"
+    
+    sudo -u postgres psql -d med_qa_test_db -c "GRANT ALL ON SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_test_db -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_test_db -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO postgres;"
+    sudo -u postgres psql -d med_qa_test_db -c "GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO postgres;"
     
     log_success "База данных настроена"
 }
@@ -321,6 +341,12 @@ run_migrations_seeds() {
     
     cd "$INSTALL_DIR/server"
     
+    # Установка sequelize-cli если не установлена
+    if ! command -v npx &> /dev/null || ! npx sequelize-cli --version &> /dev/null; then
+        log_info "Установка sequelize-cli..."
+        npm install -g sequelize-cli
+    fi
+    
     # Экспорт переменных окружения для production
     export NODE_ENV=production
     export DB_HOST=localhost
@@ -330,19 +356,25 @@ run_migrations_seeds() {
     export DB_PASSWORD=K3nP5V9mN8xR2dW7qL4pY6tA1sZ3cU8f
     
     # Запуск миграций
-    if command -v npx &> /dev/null; then
-        npx sequelize-cli db:migrate
+    log_info "Запуск миграций..."
+    npx sequelize-cli db:migrate --env production
+    
+    if [ $? -eq 0 ]; then
         log_success "Миграции выполнены"
-        
-        # Загрузка сидов
-        npx sequelize-cli db:seed:all
+    else
+        log_error "Ошибка выполнения миграций"
+        return 1
+    fi
+    
+    # Загрузка сидов
+    log_info "Загрузка сидов..."
+    npx sequelize-cli db:seed:all --env production
+    
+    if [ $? -eq 0 ]; then
         log_success "Сиды загружены"
     else
-        log_warning "Sequelize CLI не найден. Пропуск миграций и сидов."
-        log_info "Вы можете выполнить их вручную позже:"
-        log_info "  cd $INSTALL_DIR/server"
-        log_info "  npx sequelize-cli db:migrate"
-        log_info "  npx sequelize-cli db:seed:all"
+        log_error "Ошибка загрузки сидов"
+        return 1
     fi
     
     log_success "Миграции и сиды обработаны"
@@ -354,12 +386,11 @@ setup_systemd_service() {
     
     # Обновление конфигурации systemd с IP адресом и доменом
     if [ -n "$IP_ADDRESS" ]; then
-        sed -i "s|ExecStart=/usr/bin/node index.js|ExecStart=/usr/bin/node index.js|g" "$INSTALL_DIR/deployment/med-qa.service"
-        sed -i "s|\[Service\]|[Service]\nEnvironment=HOST=$IP_ADDRESS|g" "$INSTALL_DIR/deployment/med-qa.service"
+        sed -i "s|Environment=HOST=localhost|Environment=HOST=$IP_ADDRESS|g" "$INSTALL_DIR/deployment/med-qa.service"
     fi
     
     if [ -n "$DOMAIN" ]; then
-        sed -i "s|Environment=DOMAIN=medsester.ru|Environment=DOMAIN=$DOMAIN|g" "$INSTALL_DIR/deployment/med-qa.service"
+        sed -i "s|Environment=DOMAIN=localhost|Environment=DOMAIN=$DOMAIN|g" "$INSTALL_DIR/deployment/med-qa.service"
     fi
     
     # Копирование файла сервиса
@@ -378,14 +409,9 @@ setup_systemd_service() {
 setup_nginx() {
     log_info "Настройка Nginx..."
     
-    # Обновление конфигурации Nginx с IP адресом
-    if [ -n "$IP_ADDRESS" ]; then
-        sed -i "s|server_name medsester.ru www.medsester.ru|server_name medsester.ru www.medsester.ru $IP_ADDRESS|g" "$INSTALL_DIR/deployment/nginx.conf"
-    fi
-    
+    # Обновление конфигурации Nginx с IP адресом и доменом
     if [ -n "$DOMAIN" ]; then
-        sed -i "s|server_name medsester.ru|server_name $DOMAIN|g" "$INSTALL_DIR/deployment/nginx.conf"
-        sed -i "s|www.medsester.ru|$DOMAIN www.$DOMAIN|g" "$INSTALL_DIR/deployment/nginx.conf"
+        sed -i "s|server_name medsester.ru www.medsester.ru|server_name $DOMAIN www.$DOMAIN|g" "$INSTALL_DIR/deployment/nginx.conf"
     fi
     
     # Копирование конфигурации Nginx
@@ -393,6 +419,11 @@ setup_nginx() {
     
     # Создание символической ссылки
     ln -sf /etc/nginx/sites-available/med-qa /etc/nginx/sites-enabled/
+    
+    # Удаление конфигурации по умолчанию, если существует
+    if [ -f /etc/nginx/sites-enabled/default ]; then
+        rm /etc/nginx/sites-enabled/default
+    fi
     
     # Тестирование конфигурации
     nginx -t

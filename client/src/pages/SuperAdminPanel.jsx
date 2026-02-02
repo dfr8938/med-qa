@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import UserManagement from '../components/UserManagement'
+import ActionLog from '../components/ActionLog'
 import Notification from '../components/Notification'
 import AddAdminModal from '../components/AddAdminModal'
 import EditAdminModal from '../components/EditAdminModal'
@@ -199,13 +200,21 @@ function SuperAdminPanel() {
             </button>
           </div>
           
-          <UserManagement
-            users={users}
-            onRoleChange={handleRoleChange}
-            onDelete={handleDeleteClick}
-            onUpdateUsers={handleUpdateUsers}
-            onEdit={handleEditClick}
-          />
+          <div className="tabs">
+            <div className="tab-content">
+              <UserManagement
+                users={users}
+                onRoleChange={handleRoleChange}
+                onDelete={handleDeleteClick}
+                onUpdateUsers={handleUpdateUsers}
+                onEdit={handleEditClick}
+              />
+            </div>
+            
+            <div className="tab-content">
+              <ActionLog />
+            </div>
+          </div>
           
         </div>
       </div>

@@ -57,6 +57,7 @@ function createApp() {
   app.use('/api/questions', require('./routes/questions'))
   app.use('/api/categories', require('./routes/categories'))
   app.use('/api/users', require('./routes/users'))
+  app.use('/api/actionlogs', require('./routes/actionlogs'))
 
   // Обработка корневого маршрута
   app.get('/', (req, res) => {

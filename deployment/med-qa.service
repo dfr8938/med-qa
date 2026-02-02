@@ -10,8 +10,8 @@ ExecStart=/usr/bin/node index.js
 Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
-Environment=HOST=130.49.149.185
-Environment=DOMAIN=medsester.ru
+Environment=HOST=localhost
+Environment=DOMAIN=localhost
 
 [Install]
 WantedBy=multi-user.target

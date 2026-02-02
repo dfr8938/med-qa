@@ -1848,3 +1848,77 @@ textarea.input {
     flex-wrap: wrap;
   }
 }
+/* Tabs */
+.tabs {
+  margin-top: 20px;
+}
+
+.tab-content {
+  margin-bottom: 30px;
+}
+
+/* Action Log Section */
+.action-log-section {
+  margin-top: 30px;
+}
+
+.action-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.action-log-header h3 {
+  margin: 0;
+}
+
+.action-log-stats {
+  margin-bottom: 20px;
+}
+
+.action-log-table-container {
+  overflow-x: auto;
+}
+
+.action-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.action-log-table th,
+.action-log-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.action-log-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.action-log-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.action-log-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-log-pagination .page-input-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-log-pagination .page-input {
+  width: 60px;
+  padding: 5px;
+  text-align: center;
+}

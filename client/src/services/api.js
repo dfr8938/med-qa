@@ -78,4 +78,24 @@ export const updateProfile = (profileData) => {
   return api.put('/auth/profile', profileData)
 }
 
+/**
+ * Get action logs with pagination
+ * @param {number} page - Page number
+ * @param {number} limit - Number of items per page
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const getActionLogs = (page = 1, limit = 20) => {
+  return api.get(`/actionlogs?page=${page}&limit=${limit}`)
+}
+
+/**
+ * Export action logs as CSV
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const exportActionLogs = () => {
+  return api.get('/actionlogs/export', {
+    responseType: 'blob'
+  })
+}
+
 export default api
