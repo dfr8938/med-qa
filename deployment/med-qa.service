@@ -6,10 +6,12 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/opt/med-qa-portal/server
-ExecStart=/root/.nvm/versions/node/v24.13.0/bin/node index.js
+ExecStart=/usr/bin/node index.js
 Restart=always
 RestartSec=10
 Environment=NODE_ENV=production
+Environment=HOST=130.49.149.185
+Environment=DOMAIN=medsester.ru
 
 [Install]
 WantedBy=multi-user.target

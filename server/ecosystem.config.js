@@ -9,7 +9,9 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production',
-        PORT: 5000
+        PORT: 5000,
+        HOST: '130.49.149.185',
+        DOMAIN: 'medsester.ru'
       }
     }
   ]

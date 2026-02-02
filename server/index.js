@@ -89,8 +89,9 @@ function createApp() {
 if (require.main === module) {
   const app = createApp();
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Сервер запущен на порту ${PORT}`)
+  const HOST = process.env.HOST || 'localhost';
+  app.listen(PORT, HOST, () => {
+    console.log(`Сервер запущен на ${HOST}:${PORT}`)
   })
 }
 
